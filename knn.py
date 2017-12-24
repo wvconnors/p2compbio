@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 """
 Will Connors
 
-KNN classifier
+KNN classifier for ALL/AML [binary] genetic expression microarray data with n-fold cross validation
 """
 import numpy as np;
 import sys;
@@ -89,27 +90,28 @@ for i in range(n):
     for value in neg_training_dict.values():
         for patient in value:
             neg_set.append(patient);
-    results = knn(pos_set, neg_set, test_set);
 
-    # check results
-    for j in range(0, len(results), 2):
-        if (results[j + 1] == 'P'):
-            for z in pos_dict[pos_order[i]]:
-                if (results[j] == z).all():
-                    TP += 1;
+return folds
 
-            for z in neg_dict[neg_order[i]]:
-                if (results[j] == z).all():
-                    FP += 1;
 
-        elif (results[j + 1] == 'N'):
-            for z in pos_dict[pos_order[i]]:
-                if (results[j] == z).all():
-                    FN += 1;
+def fileOut(k, p, n, TP, FP, TN, FN):
+    return None
+    """
+    function to handle performance reporting back to user console and file
+    Inputs:
+        k ::
+        p ::
+        n ::
+        TP ::
+        FP ::
+        TN ::
+        FN ::
+    Outputs:
+        console ::
+        knn.out ::
+        returns None
+    """
 
-            for z in neg_dict[neg_order[i]]:
-                if (results[j] == z).all():
-                    TN += 1;
 
 ##KNN output
 print("k: ", k);

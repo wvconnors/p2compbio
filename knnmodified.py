@@ -9,8 +9,6 @@ import sys;
 
 
 def main(positives, negatives, k, p=0.5, n):
-
-
     '''
     Inputs:
         positives :: tsv file location of positive integer expression readout,
@@ -22,6 +20,8 @@ def main(positives, negatives, k, p=0.5, n):
         file write out :: file 'knn.out' in working dir mirrors console output,
         returns :: None
     '''
+
+
 # Initialize, read in data
 try:
     ALL = np.loadtxt(positives, dtype=int, delimiter='\t', unpack=True);
@@ -65,8 +65,6 @@ return fileOut(k, p, n, TP, FP, TN, FN)
 
 
 def knn(pos_training, neg_training, test):
-
-
     '''
     KNN algorithm implementation
     Inputs:
@@ -77,6 +75,8 @@ def knn(pos_training, neg_training, test):
         classification :: A list alternating between a given test point(an array) and its ALL classification ('N' or 'P')
 
     '''
+
+
 classification = [];
 
 for point in test:
@@ -109,8 +109,6 @@ return classification;
 
 
 def nFold(n, pos, neg):
-
-
     '''
     n-fold cross validation
     Inputs:
@@ -120,6 +118,7 @@ def nFold(n, pos, neg):
     Outputs:
         folds :: n-length list of 3-tuple (pos, neg, test) arrays of np ndim data points
     '''
+
 
 # Randomize the positive data and divide it into n equally (or as close to equal as possible) sized sets.
 np.random.shuffle(ALL);
@@ -163,8 +162,6 @@ return folds
 
 
 def fileOut(k, p, n, TP, FP, TN, FN):
-
-
     '''
     function to handle performance reporting back to user console and file
     Inputs:
@@ -180,6 +177,8 @@ def fileOut(k, p, n, TP, FP, TN, FN):
         knn.out ::
         returns None
     '''
+
+
 ##KNN output
 print("k: ", k);
 print("p: ", "%.2f" % p);
