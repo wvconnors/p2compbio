@@ -14,12 +14,20 @@ import numpy as np
 
 
 def main(k, data_file, max_it, centroids_file = None):
-    """
+    """ function main() encapsulates the entire functionality and execution of kmeans.py,
+    implementing kmeans clustering of TSV texts.
+
+    k ::
+    expression.dat :: string;
+    max.it :: int;
+    optional: centroids.txt :: string ;
+
+    No returns
     """
     matrix, centroid_loc = configure(k, data_file, centroids_file)
     # build some mappings
-    pt_affil = np.empty()
-    centroid_posse = np.empty()
+    pt_affil = list(len(matrix)[0])  # np.empty_like()
+    centroid_posse = list(range(k))# np.empty()
     converged_after = max_it
     for w in range(max_it):
         pt_affil, centroid_posse, settled = updateclusters(matrix, centroid_loc,
@@ -36,38 +44,63 @@ def main(k, data_file, max_it, centroids_file = None):
 
 
 def configure(k, pts_path, centroids):
-    """
+    """ function configure(), called by main(), handles file read in, centroid read or generation,
+    and exception handling
+    INPUTS:
+      k :: int;
+      pts_path :: string;
+      centroids :: None | string;
+    OUTPUTS:
+      vectors :: np.ndarray<float>;
+      centr_0 :: list(np.ndarray,float.)?;
     """
     try:
+        vectors = []
+        centr_0 = []
         vectors = np.loadtxt(pts_path, delimiter='\t')
         if centroids is None:
             for j in range(k):
+                centr_0 = 5
                 # centroids[i][j] = np.random.randint(min(expression[::][j]), max(expression[::][j]))
         else:
-            centroids = np.loadtxt(pts_path, delimiter='\t')
+            centr_0 = np.loadtxt(centroids, delimiter='\t')
     except IOError:
         raise IOError("Couldn't read in expression data and/or centroids file!")
-    pass
+
+    return vectors, centr_0
 
 
 def updateclusters(matrix, centroids_loc, pt_affil, centroid_posse):
-    """
+    """ function updateclusters(), called by main(), in alternating steps of kmeans() convergence
+    matrix ::
+    centroids_loc ::
+    pt_affil ::
+    centroid_posse ::
+
+    pt_affil ::
+    centroid_posse ::
+    settled ::
     """
 
-    # return pt_affil, centroid_posse, settled
-    pass
+    return pt_affil, centroid_posse, settled
 
 
 def updatecentroids(matrix, centroids_loc, centroid_posse):
-    """
+    """ function updatecentroids(), called by main(), in alternating steps of kmeans() convergence
+    matrix ::
+    centroids_loc ::
+    centroid_posse ::
+
+    centroids_loc ::
     """
 
-    # return centroids_loc
-    pass
+    return centroids_loc
 
 
 def report(iterations, cluster_assignments):
-    """
+    """ function report(), called by main(), handles post-UX, file reading, and error handling
+    iterations :: int;
+    cluster_assignments :: list(tuples<int>);
     """
     print("iterations: " + str(iterations))
     try:
@@ -84,7 +117,7 @@ def report(iterations, cluster_assignments):
 if __name__ == '__main__':
     # check right number of args
     if len(sys.argv) >= 3 and len(sys.argv) <= 5:
-        main(sys.argv[1:])
+        main(*sys.argv[1:])
         exit(0)
 
     else:
