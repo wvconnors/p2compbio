@@ -1,80 +1,125 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 24 19:34:30 2015
+#!/usr/bin/env python
+"""  kmeans.py is a python 2.7 script implementing kmeans clustering, per the
+spec of Stanford class BMI 214, project 2
 
-@author: Will
+@author: Will Connors
+usage:
+  python kmeans.py k expression.dat max.it centroids.txt
+
 """
 
-import numpy as np 
+from __future__ import absolute_import, division, print_function
 import sys
-import os
+import numpy as np
 
-#
-# python kmeans.py k expression.dat max.it centroids.txt
-# K-means input
 
-expression = np.loadtxt(sys.argv[2], delimiter='\t') 
-k = int(sys.argv[1]) 
-max_it = int(sys.argv[3]) 
+def main(k, data_file, max_it, centroids_file = None):
+    """ function main() encapsulates the entire functionality and execution of kmeans.py,
+    implementing kmeans clustering of TSV texts.
 
-# K-means algorithm
-#
-# Initialize k centroids.
-centroids = np.zeros((k, len(expression[0]))) 
+    k ::
+    expression.dat :: string;
+    max.it :: int;
+    optional: centroids.txt :: string ;
 
-# If a centroid file is provided, these are the starting centroids. If not, generate k centroids randomly (see details for initializing centroids below).
-if (len(sys.argv) == 4):
-    for i in range(k):
-        for j in range(len(expression)):
-            centroids[i][j] = np.random.randint(min(expression[::][j]), max(expression[::][j])) 
-else:
+    No returns
+    """
+    matrix, centroid_loc = configure(k, data_file, centroids_file)
+    # build some mappings
+    pt_affil = list(len(matrix)[0])  # np.empty_like()
+    centroid_posse = list(range(k))# np.empty()
+    converged_after = max_it
+    for w in range(max_it):
+        pt_affil, centroid_posse, settled = updateclusters(matrix, centroid_loc,
+                                                           pt_affil, centroid_posse)
+        centroid_loc = updatecentroids(matrix, centroid_loc, centroid_posse)
+        if settled:
+            converged_after = w
+            break
+    # else:
+    #     print('Warning, max iterations reached without stable assignments!')
+
+    report(converged_after, pt_affil)
+    return
+
+
+def configure(k, pts_path, centroids):
+    """ function configure(), called by main(), handles file read in, centroid read or generation,
+    and exception handling
+    INPUTS:
+      k :: int;
+      pts_path :: string;
+      centroids :: None | string;
+    OUTPUTS:
+      vectors :: np.ndarray<float>;
+      centr_0 :: list(np.ndarray,float.)?;
+    """
     try:
-        centroids = np.loadtxt(sys.argv[4], delimiter='\t') 
-    except IndexError:
-        print('centroids') 
+        vectors = []
+        centr_0 = []
+        vectors = np.loadtxt(pts_path, delimiter='\t')
+        if centroids is None:
+            for j in range(k):
+                centr_0 = 5
+                # centroids[i][j] = np.random.randint(min(expression[::][j]), max(expression[::][j]))
+        else:
+            centr_0 = np.loadtxt(centroids, delimiter='\t')
+    except IOError:
+        raise IOError("Couldn't read in expression data and/or centroids file!")
 
-iterations = 0 
-converged = False 
-old_centroids = centroids.copy() 
-point_map = {} 
-while (iterations <= max_it and not converged):
-    cluster_map = {} 
-    for i in range(k):
-        cluster_map[i] = [] 
+    return vectors, centr_0
 
-    # For each data point, assign it to a cluster such that the Euclidean distance from the data point to the centroid is minimized.
-    for i in range(len(expression)):
-        centr_dist = {} 
-        for centroid in centroids:
-            # compute distance to all centroids
-            centr_dist[np.sqrt(np.sum((centroid - expression[i]) ** 2, dtype=np.int64))] = centroid 
-        # assign point to sorted min centroid
-        dist_list = np.sort(list(centr_dist.keys())) 
-        # need more efficient way to determine centroid number...
-        index = np.where(centroids == centr_dist[dist_list[0]]) 
-        cluster_map[np.median(index[0])].append(expression[i]) 
-        point_map[i] = np.median(index[0]) 
 
-    # For each cluster, move the centroid to be at the center of all points that belong to that cluster.
-    for i in range(k):
-        new_centroid = centroids[i] 
-        for dimen in range(len(cluster_map[i][0])):
-            new_centroid[dimen] = np.average(cluster_map[i][::][dimen]) 
-        centroids[i] = new_centroid 
-    iterations += 1 
-    if (old_centroids == centroids).all():
-        converged = True 
+def updateclusters(matrix, centroids_loc, pt_affil, centroid_posse):
+    """ function updateclusters(), called by main(), in alternating steps of kmeans() convergence
+    matrix ::
+    centroids_loc ::
+    pt_affil ::
+    centroid_posse ::
+
+    pt_affil ::
+    centroid_posse ::
+    settled ::
+    """
+
+    return pt_affil, centroid_posse, settled
+
+
+def updatecentroids(matrix, centroids_loc, centroid_posse):
+    """ function updatecentroids(), called by main(), in alternating steps of kmeans() convergence
+    matrix ::
+    centroids_loc ::
+    centroid_posse ::
+
+    centroids_loc ::
+    """
+
+    return centroids_loc
+
+
+def report(iterations, cluster_assignments):
+    """ function report(), called by main(), handles post-UX, file reading, and error handling
+    iterations :: int;
+    cluster_assignments :: list(tuples<int>);
+    """
+    print("iterations: " + str(iterations))
+    try:
+        with file('./kmeans.out', 'w') as f:
+            f.write('Allo, allo!')
+            #for i in range(len(expression)):
+            #    out.write(str(i) + '\t' + str(point_map[i] + 1) + '\n')
+    except IOError:
+        raise IOError('Trouble writing results to file!')
+    return
+
+
+# ------------ script execution --------------
+if __name__ == '__main__':
+    # check right number of args
+    if len(sys.argv) >= 3 and len(sys.argv) <= 5:
+        main(*sys.argv[1:])
+        exit(0)
+
     else:
-        old_centroids = centroids.copy() 
+        raise SyntaxError('Incorrect number of arguments!', sys.argv)
 
-# Iterate steps 2 and 3 until convergence or after a certain number of iterations (see details for stopping conditions below).
-#
-#
-# K-means output
-# iterations: 45
-print("iterations: " + str(iterations)) 
-
-# When your program reaches a stopping condition, cluster assignments should be written to a tab-delimited file called kmeans.out. The first column contains the genes listed by index as ordered in the input data file (starting at 1). The first gene must gene 1, the 2nd gene 2, etc. The second column should contain the number of the cluster the gene is assigned to.
-with open("kmeans.out", 'w') as out:
-    for i in range(len(expression)):
-        out.write(str(i) + '\t' + str(point_map[i] + 1) + '\n') 
